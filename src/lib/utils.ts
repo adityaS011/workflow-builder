@@ -20,7 +20,7 @@ export function formatDate(date: Date | string): string {
   }).format(dateObj);
 }
 
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: Parameters<T>) => ReturnType<T>>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {

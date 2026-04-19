@@ -1,158 +1,88 @@
 'use client'
 
-import { useState } from 'react'
-import { X, Save, Play, Filter, GitBranch, Zap } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { X, Save } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useWorkflowStore } from '@/store/workflow-store'
+import { getNodeMeta } from './node-meta'
+import { getNodeFields } from './node-fields'
+import { NodeField } from './node-field'
 
 export function NodePropertiesPanel() {
-  const { selectedNodes, updateNode, currentWorkflow, clearSelection } = useWorkflowStore()
-  const [formData, setFormData] = useState<Record<string, any>>({})
+  const { selectedNodes, currentWorkflow, updateNode, clearSelection } = useWorkflowStore()
+  const [formData, setFormData] = useState<Record<string, string>>({})
 
-  const selectedNodeId = selectedNodes[0] // Get first selected node
-  const selectedNode = currentWorkflow?.nodes.find(n => n.id === selectedNodeId) || null
+  const selectedNodeId = selectedNodes[0]
+  const selectedNode = currentWorkflow?.nodes.find((n) => n.id === selectedNodeId) ?? null
 
-  const getIcon = (type: string) => {
-    switch (type) {
-      case 'event': return <Play className="h-4 w-4 text-green-600" />
-      case 'filter': return <Filter className="h-4 w-4 text-blue-600" />
-      case 'condition': return <GitBranch className="h-4 w-4 text-purple-600" />
-      case 'action': return <Zap className="h-4 w-4 text-orange-600" />
-      default: return <Play className="h-4 w-4 text-gray-600" />
-    }
-  }
-
-  const getNodeFields = (type: string) => {
-    switch (type) {
-      case 'event':
-        return [
-          { key: 'eventName', label: 'Event Name', type: 'text', placeholder: 'button_click' },
-          { key: 'description', label: 'Description', type: 'textarea', placeholder: 'Describe this event trigger...' },
-        ]
-      case 'filter':
-        return [
-          { key: 'property', label: 'Property', type: 'text', placeholder: 'country' },
-          { key: 'operator', label: 'Operator', type: 'select', options: ['equals', 'not_equals', 'contains', 'not_contains'], placeholder: 'Select operator...' },
-          { key: 'value', label: 'Value', type: 'text', placeholder: 'India' },
-        ]
-      case 'condition':
-        return [
-          { key: 'metric', label: 'Metric', type: 'select', options: ['count', 'sum', 'avg'], placeholder: 'Select metric...' },
-          { key: 'operator', label: 'Operator', type: 'select', options: ['>', '<', '>=', '<=', '=='], placeholder: 'Select operator...' },
-          { key: 'threshold', label: 'Threshold', type: 'number', placeholder: '100' },
-          { key: 'timeWindow', label: 'Time Window (minutes)', type: 'number', placeholder: '5' },
-        ]
-      case 'action':
-        return [
-          { key: 'actionType', label: 'Action Type', type: 'select', options: ['console_log', 'slack_webhook', 'alert'], placeholder: 'Select action...' },
-          { key: 'message', label: 'Message', type: 'textarea', placeholder: 'Action message...' },
-          { key: 'webhookUrl', label: 'Webhook URL', type: 'text', placeholder: 'https://hooks.slack.com/...' },
-        ]
-      default:
-        return []
-    }
-  }
-
-  const handleInputChange = (key: string, value: any) => {
-    setFormData(prev => ({ ...prev, [key]: value }))
-  }
-
-  const handleSave = () => {
-    if (selectedNodeId && selectedNode) {
-      updateNode(selectedNodeId, { 
-        data: { 
-          label: selectedNode?.data?.label || '',
-          description: selectedNode?.data?.description || '',
-          config: formData 
-        }
-      })
-      // Clear selection to close the panel
-      clearSelection()
-      // Reset form data
+  // Pre-populate form when selected node changes
+  useEffect(() => {
+    if (selectedNode?.data?.config) {
+      const stringified: Record<string, string> = {}
+      for (const [k, v] of Object.entries(selectedNode.data.config)) {
+        stringified[k] = String(v ?? '')
+      }
+      setFormData(stringified)
+    } else {
       setFormData({})
     }
+  }, [selectedNodeId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleChange = (key: string, value: string) =>
+    setFormData((prev) => ({ ...prev, [key]: value }))
+
+  const handleSave = () => {
+    if (!selectedNodeId || !selectedNode) return
+    updateNode(selectedNodeId, {
+      data: {
+        label: selectedNode.data.label,
+        description: selectedNode.data.description,
+        config: formData as Record<string, unknown>,
+      },
+    })
+    clearSelection()
   }
 
-  if (!selectedNode) {
-    return (
-      <div className="w-80 bg-card border-l border-border h-full p-4">
-        <div className="flex items-center justify-center h-full text-muted-foreground">
-          <div className="text-center">
-            <Play className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-            <p className="text-sm">Select a node to edit its properties</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  if (!selectedNode) return null
 
-  const fields = getNodeFields(selectedNode?.data?.type || '')
+  const meta = getNodeMeta(selectedNode.type)
+  const Icon = meta.Icon
+  const fields = getNodeFields(selectedNode.type)
 
   return (
-    <div className="w-80 bg-card border-l border-border h-full flex flex-col">
+    <div className="w-80 bg-card border-l border-border h-full flex flex-col flex-shrink-0">
       {/* Header */}
-      <div className="p-4 border-b border-border">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {getIcon(selectedNode?.data?.type || '')}
-            <span className="font-medium text-sm">{selectedNode?.data?.label || ''}</span>
-          </div>
-          <Button variant="ghost" size="sm">
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
+      <div className="flex items-center gap-2 px-3 h-12 border-b border-border flex-shrink-0">
+        <Icon className={`h-3.5 w-3.5 ${meta.color}`} />
+        <span className="text-xs font-semibold text-foreground flex-1 truncate">{selectedNode.data.label}</span>
+        <button
+          onClick={clearSelection}
+          className="p-1 rounded hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
       </div>
 
-      {/* Form */}
-      <div className="flex-1 overflow-y-auto p-4">
-        <div className="space-y-4">
-          {fields.map((field) => (
-            <div key={field.key} className="space-y-2">
-              <label className="text-sm font-medium text-card-foreground">
-                {field.label}
-              </label>
-              {field.type === 'textarea' ? (
-                <textarea
-                  className="w-full p-2 border border-border rounded-md bg-background text-card-foreground text-sm"
-                  rows={3}
-                  placeholder={field.placeholder}
-                  value={formData[field.key] || ''}
-                  onChange={(e) => handleInputChange(field.key, e.target.value)}
-                />
-              ) : field.type === 'select' ? (
-                <select
-                  className="w-full p-2 border border-border rounded-md bg-background text-card-foreground text-sm"
-                  value={formData[field.key] || ''}
-                  onChange={(e) => handleInputChange(field.key, e.target.value)}
-                >
-                  <option value="">{field.placeholder}</option>
-                  {field.options?.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <input
-                  type={field.type}
-                  className="w-full p-2 border border-border rounded-md bg-background text-card-foreground text-sm"
-                  placeholder={field.placeholder}
-                  value={formData[field.key] || ''}
-                  onChange={(e) => handleInputChange(field.key, e.target.value)}
-                  step={field.step}
-                  min={field.min}
-                  max={field.max}
-                />
-              )}
-            </div>
-          ))}
-        </div>
+      {/* Fields */}
+      <div className="flex-1 overflow-y-auto p-3 space-y-4">
+        {fields.length === 0 ? (
+          <p className="text-xs text-muted-foreground">No configuration for this node type.</p>
+        ) : (
+          fields.map((field) => (
+            <NodeField
+              key={field.key}
+              field={field}
+              value={formData[field.key] ?? ''}
+              onChange={handleChange}
+            />
+          ))
+        )}
       </div>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-border">
-        <Button onClick={handleSave} className="w-full">
-          <Save className="h-4 w-4 mr-2" />
+      {/* Save */}
+      <div className="p-3 border-t border-border flex-shrink-0">
+        <Button onClick={handleSave} className="w-full h-8 text-xs bg-primary hover:bg-primary/90">
+          <Save className="h-3.5 w-3.5 mr-1.5" />
           Save Changes
         </Button>
       </div>

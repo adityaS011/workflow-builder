@@ -1,0 +1,78 @@
+import { useCallback } from 'react'
+import { useWorkflowStore } from '@/store/workflow-store'
+import { useRunStore } from '@/store/run-store'
+import { WorkflowNode, WorkflowEdge } from '@/types/workflow'
+
+function topologicalSort(nodes: WorkflowNode[], edges: WorkflowEdge[]): WorkflowNode[] {
+  const outgoing = new Map<string, string[]>()
+  const inDegree = new Map<string, number>()
+
+  nodes.forEach((n) => { outgoing.set(n.id, []); inDegree.set(n.id, 0) })
+  edges.forEach((e) => {
+    outgoing.get(e.source)?.push(e.target)
+    inDegree.set(e.target, (inDegree.get(e.target) ?? 0) + 1)
+  })
+
+  const queue = nodes.filter((n) => (inDegree.get(n.id) ?? 0) === 0)
+  const sorted: WorkflowNode[] = []
+
+  while (queue.length > 0) {
+    const node = queue.shift()!
+    sorted.push(node)
+    for (const neighborId of outgoing.get(node.id) ?? []) {
+      const deg = (inDegree.get(neighborId) ?? 0) - 1
+      inDegree.set(neighborId, deg)
+      if (deg === 0) {
+        const neighbor = nodes.find((n) => n.id === neighborId)
+        if (neighbor) queue.push(neighbor)
+      }
+    }
+  }
+
+  return sorted.length === nodes.length ? sorted : nodes
+}
+
+export function useRunWorkflow() {
+  const { currentWorkflow, validateWorkflow } = useWorkflowStore()
+  const { setRunStatus, setActiveNodeId, setCompletedNodeIds, setErrorNodeId, resetRunState } = useRunStore()
+
+  const run = useCallback(async () => {
+    if (!currentWorkflow) return
+
+    const { valid, errors } = validateWorkflow()
+    if (!valid) {
+      alert(`Cannot run:\n• ${errors.join('\n• ')}`)
+      return
+    }
+
+    resetRunState()
+    setRunStatus('running')
+
+    const sorted = topologicalSort(currentWorkflow.nodes, currentWorkflow.edges)
+    const completed: string[] = []
+
+    for (const node of sorted) {
+      setActiveNodeId(node.id)
+      await new Promise<void>((resolve) => setTimeout(resolve, 500 + Math.random() * 500))
+
+      const mightFail = node.type === 'http' || node.type === 'llm'
+      if (mightFail && Math.random() < 0.08) {
+        setErrorNodeId(node.id)
+        setActiveNodeId(null)
+        setRunStatus('error')
+        return
+      }
+
+      completed.push(node.id)
+      setCompletedNodeIds([...completed])
+    }
+
+    setActiveNodeId(null)
+    setRunStatus('success')
+    setTimeout(() => resetRunState(), 3000)
+  }, [currentWorkflow, validateWorkflow, setRunStatus, setActiveNodeId, setCompletedNodeIds, setErrorNodeId, resetRunState])
+
+  const stop = useCallback(() => resetRunState(), [resetRunState])
+
+  return { run, stop }
+}

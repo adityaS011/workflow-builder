@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Search, ChevronLeft, ChevronRight } from 'lucide-react'
-import { Input } from '@/components/ui/input'
+import { Input } from '@/shared/ui/input'
 import { NODE_TEMPLATES, SIDEBAR_CATEGORIES, type SidebarNodeTemplate } from './node-templates'
 
 interface WorkflowSidebarProps {

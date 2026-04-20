@@ -2,8 +2,8 @@
 
 import { useEffect } from 'react'
 import { useParams } from 'next/navigation'
-import { WorkflowEditor } from '@/components/workflow/workflow-editor'
-import { useWorkflowStore } from '@/store/workflow-store'
+import { WorkflowEditor } from '@/features/workflows/components/workflow-editor'
+import { useWorkflowStore } from '@/features/workflows/store/workflow-store'
 
 export default function WorkflowPage() {
   const params = useParams()

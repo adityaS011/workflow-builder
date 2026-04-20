@@ -2,9 +2,9 @@
 
 import { useRouter } from 'next/navigation'
 import { Edit, Trash2, Copy, GitBranch } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Workflow } from '@/types/workflow'
-import { formatDate } from '@/lib/utils'
+import { Button } from '@/shared/ui/button'
+import { Workflow } from '@/features/workflows/types'
+import { formatDate } from '@/shared/lib/utils'
 
 interface WorkflowCardProps {
   workflow: Workflow

@@ -2,15 +2,16 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { Plus, Search, Zap, GitBranch, Sparkles } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { StatsBar } from '@/components/home/stats-bar'
-import { WorkflowCard } from '@/components/home/workflow-card'
-import { useWorkflowStore } from '@/store/workflow-store'
-import { generateId } from '@/lib/utils'
-import { createSampleWorkflow } from '@/lib/sample-workflow'
-import { Workflow } from '@/types/workflow'
+import { Button } from '@/shared/ui/button'
+import { Input } from '@/shared/ui/input'
+import { StatsBar } from '@/features/workflows/components/stats-bar'
+import { WorkflowCard } from '@/features/workflows/components/workflow-card'
+import { useWorkflowStore } from '@/features/workflows/store/workflow-store'
+import { generateId } from '@/shared/lib/utils'
+import { createSampleWorkflow } from '@/features/workflows/lib/sample-workflow'
+import { Workflow } from '@/features/workflows/types'
 
 const STATUS_TABS = ['all', 'draft', 'published', 'archived'] as const
 type StatusTab = typeof STATUS_TABS[number]
@@ -46,13 +47,26 @@ export default function WorkflowList() {
       status: 'draft',
     }
     addWorkflow(workflow)
+    toast.success('Workflow created')
     router.push(`/workflow/${workflow.id}`)
   }
 
   const handleLoadSample = () => {
     const sample = createSampleWorkflow()
     addWorkflow(sample)
+    toast.success('Sample loaded', { description: 'AI Support Ticket Triage' })
     router.push(`/workflow/${sample.id}`)
+  }
+
+  const handleDelete = (id: string) => {
+    const workflow = workflows.find((w) => w.id === id)
+    deleteWorkflow(id)
+    toast.success('Workflow deleted', { description: workflow?.name })
+  }
+
+  const handleDuplicate = (id: string) => {
+    duplicateWorkflow(id)
+    toast.success('Workflow duplicated')
   }
 
   return (
@@ -105,7 +119,7 @@ export default function WorkflowList() {
         {filteredWorkflows.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
             {filteredWorkflows.map((workflow) => (
-              <WorkflowCard key={workflow.id} workflow={workflow} onDelete={deleteWorkflow} onDuplicate={duplicateWorkflow} />
+              <WorkflowCard key={workflow.id} workflow={workflow} onDelete={handleDelete} onDuplicate={handleDuplicate} />
             ))}
           </div>
         ) : (

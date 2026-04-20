@@ -1,7 +1,8 @@
 import { useCallback } from 'react'
-import { useWorkflowStore } from '@/store/workflow-store'
-import { useRunStore } from '@/store/run-store'
-import { WorkflowNode, WorkflowEdge } from '@/types/workflow'
+import { toast } from 'sonner'
+import { useWorkflowStore } from '@/features/workflows/store/workflow-store'
+import { useRunStore } from '@/features/workflows/store/run-store'
+import { WorkflowNode, WorkflowEdge } from '@/features/workflows/types'
 
 function topologicalSort(nodes: WorkflowNode[], edges: WorkflowEdge[]): WorkflowNode[] {
   const outgoing = new Map<string, string[]>()
@@ -41,12 +42,15 @@ export function useRunWorkflow() {
 
     const { valid, errors } = validateWorkflow()
     if (!valid) {
-      alert(`Cannot run:\n• ${errors.join('\n• ')}`)
+      toast.error('Cannot run workflow', {
+        description: errors.join(' · '),
+      })
       return
     }
 
     resetRunState()
     setRunStatus('running')
+    toast.info('Running workflow…', { duration: 1500 })
 
     const sorted = topologicalSort(currentWorkflow.nodes, currentWorkflow.edges)
     const completed: string[] = []
@@ -60,6 +64,9 @@ export function useRunWorkflow() {
         setErrorNodeId(node.id)
         setActiveNodeId(null)
         setRunStatus('error')
+        toast.error(`${node.data.label} failed`, {
+          description: 'Simulated network error. Check logs and retry.',
+        })
         return
       }
 
@@ -69,6 +76,7 @@ export function useRunWorkflow() {
 
     setActiveNodeId(null)
     setRunStatus('success')
+    toast.success('Workflow completed', { description: `${sorted.length} steps executed` })
     setTimeout(() => resetRunState(), 3000)
   }, [currentWorkflow, validateWorkflow, setRunStatus, setActiveNodeId, setCompletedNodeIds, setErrorNodeId, resetRunState])
 

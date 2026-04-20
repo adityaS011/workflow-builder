@@ -1,47 +1,35 @@
 'use client'
 
-import { NodeFieldDef } from '@/types/workflow'
+import { NodeFieldDef } from '@/features/workflows/types'
+import type { UseFormRegister, FieldValues, Path, FieldError } from 'react-hook-form'
 
-interface NodeFieldProps {
+interface NodeFieldProps<TValues extends FieldValues> {
   field: NodeFieldDef
-  value: string
-  onChange: (key: string, value: string) => void
+  register: UseFormRegister<TValues>
+  error?: FieldError
 }
 
 const BASE_CLASS =
-  'w-full px-3 py-1.5 text-xs rounded-lg border border-border bg-secondary text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/60 transition-colors'
+  'w-full px-3 py-1.5 text-xs rounded-lg border bg-secondary text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 transition-colors'
 
-export function NodeField({ field, value, onChange }: NodeFieldProps) {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-    onChange(field.key, e.target.value)
+export function NodeField<TValues extends FieldValues>({ field, register, error }: NodeFieldProps<TValues>) {
+  const errorClass = error ? 'border-destructive/60 focus:ring-destructive/60' : 'border-border focus:ring-primary/60'
+  const cls = `${BASE_CLASS} ${errorClass}`
+  const registered = register(field.key as Path<TValues>)
 
   return (
     <div className="space-y-1.5">
-      <label className="block text-xs font-medium text-muted-foreground">
-        {field.label}
-      </label>
+      <label className="block text-xs font-medium text-muted-foreground">{field.label}</label>
 
       {field.type === 'textarea' && (
-        <textarea
-          className={`${BASE_CLASS} resize-none`}
-          rows={3}
-          placeholder={field.placeholder}
-          value={value}
-          onChange={handleChange}
-        />
+        <textarea className={`${cls} resize-none`} rows={3} placeholder={field.placeholder} {...registered} />
       )}
 
       {field.type === 'select' && (
-        <select
-          className={BASE_CLASS}
-          value={value}
-          onChange={handleChange}
-        >
+        <select className={cls} {...registered}>
           <option value="">{field.placeholder ?? 'Select…'}</option>
           {field.options?.map((opt) => (
-            <option key={opt} value={opt}>
-              {opt}
-            </option>
+            <option key={opt} value={opt}>{opt}</option>
           ))}
         </select>
       )}
@@ -49,15 +37,16 @@ export function NodeField({ field, value, onChange }: NodeFieldProps) {
       {(field.type === 'text' || field.type === 'number') && (
         <input
           type={field.type}
-          className={BASE_CLASS}
+          className={cls}
           placeholder={field.placeholder}
-          value={value}
-          onChange={handleChange}
           step={field.step}
           min={field.min}
           max={field.max}
+          {...registered}
         />
       )}
+
+      {error?.message && <p className="text-[11px] text-destructive">{error.message}</p>}
     </div>
   )
 }

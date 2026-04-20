@@ -1,4 +1,4 @@
-import { NodeFieldDef } from '@/types/workflow'
+import { NodeFieldDef } from '@/features/workflows/types'
 
 const FIELDS_MAP: Record<string, NodeFieldDef[]> = {
   trigger: [

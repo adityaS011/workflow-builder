@@ -1,5 +1,5 @@
-import { Workflow } from '@/types/workflow'
-import { generateId } from './utils'
+import { Workflow } from '@/features/workflows/types'
+import { generateId } from '@/shared/lib/utils'
 
 export function createSampleWorkflow(): Workflow {
   const triggerId = generateId()

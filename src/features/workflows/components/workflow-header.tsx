@@ -3,10 +3,10 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Play, Square, Download, AlertCircle, CheckCircle, Loader } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { useWorkflowStore } from '@/store/workflow-store'
-import { useRunStore, type RunStatus } from '@/store/run-store'
-import { Workflow } from '@/types/workflow'
+import { Button } from '@/shared/ui/button'
+import { useWorkflowStore } from '@/features/workflows/store/workflow-store'
+import { useRunStore, type RunStatus } from '@/features/workflows/store/run-store'
+import { Workflow } from '@/features/workflows/types'
 
 interface WorkflowHeaderProps {
   workflow: Workflow

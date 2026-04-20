@@ -2,13 +2,13 @@
 
 import { useRef } from 'react'
 import Link from 'next/link'
-import { Button } from '@/shared/ui/button'
+import { Button } from '@/components/ui/button'
 import { WorkflowSidebar } from './workflow-sidebar'
 import { WorkflowCanvas } from './workflow-canvas'
 import { WorkflowHeader } from './workflow-header'
 import { NodePropertiesPanel } from './node-properties-panel'
-import { useWorkflowStore } from '@/features/workflows/store/workflow-store'
-import { useRunWorkflow } from '@/features/workflows/hooks/use-run-workflow'
+import { useWorkflowStore } from '@/store/workflow-store'
+import { useRunWorkflow } from '@/hooks/use-run-workflow'
 import type { Node, Edge } from '@xyflow/react'
 
 export function WorkflowEditor() {

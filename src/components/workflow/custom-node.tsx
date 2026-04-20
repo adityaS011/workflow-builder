@@ -4,7 +4,7 @@ import { memo } from 'react'
 import { Handle, Position, type NodeProps } from '@xyflow/react'
 import { CheckCircle, Loader, XCircle } from 'lucide-react'
 import { getNodeMeta } from './node-meta'
-import { useRunStore } from '@/features/workflows/store/run-store'
+import { useRunStore } from '@/store/run-store'
 
 type NodeData = {
   type: string

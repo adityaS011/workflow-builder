@@ -17,9 +17,9 @@ import {
 import '@xyflow/react/dist/style.css'
 
 import { CustomNode } from './custom-node'
-import { useWorkflowStore } from '@/features/workflows/store/workflow-store'
-import { generateId } from '@/shared/lib/utils'
-import { WorkflowNode, WorkflowEdge } from '@/features/workflows/types'
+import { useWorkflowStore } from '@/store/workflow-store'
+import { generateId } from '@/lib/utils'
+import { WorkflowNode, WorkflowEdge } from '@/types/workflow'
 
 const NODE_TYPES = { custom: CustomNode }
 

@@ -1,8 +1,8 @@
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
-import { Workflow, WorkflowNode, WorkflowEdge } from '@/features/workflows/types'
-import { PersistedStateSchema } from '@/features/workflows/schemas'
-import { generateId } from '@/shared/lib/utils'
+import { Workflow, WorkflowNode, WorkflowEdge } from '@/types/workflow'
+import { PersistedStateSchema } from '@/lib/schemas'
+import { generateId } from '@/lib/utils'
 
 export type { RunStatus } from './run-store'
 

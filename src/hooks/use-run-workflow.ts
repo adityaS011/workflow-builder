@@ -1,8 +1,8 @@
 import { useCallback } from 'react'
 import { toast } from 'sonner'
-import { useWorkflowStore } from '@/features/workflows/store/workflow-store'
-import { useRunStore } from '@/features/workflows/store/run-store'
-import { WorkflowNode, WorkflowEdge } from '@/features/workflows/types'
+import { useWorkflowStore } from '@/store/workflow-store'
+import { useRunStore } from '@/store/run-store'
+import { WorkflowNode, WorkflowEdge } from '@/types/workflow'
 
 function topologicalSort(nodes: WorkflowNode[], edges: WorkflowEdge[]): WorkflowNode[] {
   const outgoing = new Map<string, string[]>()

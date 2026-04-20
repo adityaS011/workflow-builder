@@ -5,11 +5,11 @@ import { useForm, type FieldValues, type Resolver, type FieldError } from 'react
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import { X, Save } from 'lucide-react'
-import { Button } from '@/shared/ui/button'
-import { useWorkflowStore } from '@/features/workflows/store/workflow-store'
+import { Button } from '@/components/ui/button'
+import { useWorkflowStore } from '@/store/workflow-store'
 import { getNodeMeta } from './node-meta'
 import { getNodeFields } from './node-fields'
-import { NODE_SCHEMAS } from '@/features/workflows/schemas'
+import { NODE_SCHEMAS } from '@/lib/schemas'
 import { NodeField } from './node-field'
 
 type NodeKind = keyof typeof NODE_SCHEMAS

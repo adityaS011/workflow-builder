@@ -1,6 +1,6 @@
 'use client'
 
-import { NodeFieldDef } from '@/features/workflows/types'
+import { NodeFieldDef } from '@/types/workflow'
 import type { UseFormRegister, FieldValues, Path, FieldError } from 'react-hook-form'
 
 interface NodeFieldProps<TValues extends FieldValues> {

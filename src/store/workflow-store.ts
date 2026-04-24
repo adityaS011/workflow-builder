@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 import { Workflow, WorkflowNode, WorkflowEdge } from '@/types/workflow'
+import { PersistedStateSchema } from '@/lib/schemas'
 import { generateId } from '@/lib/utils'
 
 export type { RunStatus } from './run-store'
@@ -154,9 +155,17 @@ export const useWorkflowStore = create<WorkflowStore>()(
       }),
       {
         name: 'workflow-store',
-        version: 2,
+        version: 3,
         migrate: () => ({ workflows: [], filters: { search: '', tags: [], status: 'all' } }),
         partialize: (s) => ({ workflows: s.workflows, filters: s.filters }),
+        merge: (persisted, current) => {
+          const parsed = PersistedStateSchema.safeParse(persisted)
+          if (!parsed.success) {
+            console.warn('[workflow-store] Corrupted localStorage, resetting.', parsed.error.issues)
+            return current
+          }
+          return { ...current, ...parsed.data }
+        },
       }
     )
   )

@@ -1,4 +1,4 @@
-import { Webhook, Brain, Shuffle, GitBranch, Globe, Send, type LucideIcon } from 'lucide-react'
+import { Keyboard, Brain, Shuffle, GitBranch, Globe, Send, type LucideIcon } from 'lucide-react'
 
 export interface SidebarNodeTemplate {
   type: string
@@ -12,10 +12,10 @@ export interface SidebarNodeTemplate {
 
 export const NODE_TEMPLATES: SidebarNodeTemplate[] = [
   {
-    type: 'trigger',
-    name: 'Trigger',
-    description: 'Start the pipeline on a webhook, schedule, or event',
-    Icon: Webhook,
+    type: 'input',
+    name: 'Input',
+    description: 'Define the form fields users fill before a run',
+    Icon: Keyboard,
     category: 'Input',
     color: 'text-emerald-400',
     accent: 'bg-emerald-500/10 border-emerald-500/20',

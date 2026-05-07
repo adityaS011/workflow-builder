@@ -37,7 +37,7 @@ export function useRunWorkflow() {
   const { currentWorkflow, validateWorkflow } = useWorkflowStore()
   const { setRunStatus, setActiveNodeId, setCompletedNodeIds, setErrorNodeId, resetRunState } = useRunStore()
 
-  const run = useCallback(async () => {
+  const run = useCallback(async (runtimeInput: Record<string, string> = {}) => {
     if (!currentWorkflow) return
 
     const { valid, errors } = validateWorkflow()
@@ -50,7 +50,11 @@ export function useRunWorkflow() {
 
     resetRunState()
     setRunStatus('running')
-    toast.info('Running workflow…', { duration: 1500 })
+    const inputCount = Object.keys(runtimeInput).filter((key) => runtimeInput[key] !== '').length
+    toast.info('Running workflow…', {
+      description: inputCount > 0 ? `${inputCount} input value${inputCount === 1 ? '' : 's'} submitted` : undefined,
+      duration: 1500,
+    })
 
     const sorted = topologicalSort(currentWorkflow.nodes, currentWorkflow.edges)
     const completed: string[] = []

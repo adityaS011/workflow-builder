@@ -2,7 +2,7 @@ import { Workflow } from '@/types/workflow'
 import { generateId } from '@/lib/utils'
 
 export function createSampleWorkflow(): Workflow {
-  const triggerId = generateId()
+  const inputId = generateId()
   const llmId = generateId()
   const transformId = generateId()
   const conditionId = generateId()
@@ -19,15 +19,15 @@ export function createSampleWorkflow(): Workflow {
     updatedAt: new Date(),
     nodes: [
       {
-        id: triggerId,
-        type: 'trigger',
+        id: inputId,
+        type: 'input',
         position: { x: 280, y: 40 },
         data: {
-          label: 'New Ticket Webhook',
+          label: 'Ticket Input',
           config: {
-            triggerType: 'webhook',
-            eventName: '/webhook/support-ticket',
-            description: 'Fires when a new ticket arrives',
+            fields: 'customerMessage: Customer Message | textarea | required\ncustomerEmail: Customer Email | text\npriority: Priority | text',
+            defaultValues: '{"customerMessage": "I cannot log in and need help today.", "customerEmail": "alex@example.com", "priority": "high"}',
+            instructions: 'Paste the customer ticket details before running the workflow.',
           },
         },
       },
@@ -41,7 +41,7 @@ export function createSampleWorkflow(): Workflow {
             provider: 'openai',
             model: 'gpt-4o',
             systemPrompt: 'You are a support triage agent. Classify tickets into: urgent, normal, low. Return JSON: {priority, category, summary}.',
-            userPrompt: 'Ticket: {{trigger.body}}',
+            userPrompt: 'Ticket: {{input.customerMessage}}\nEmail: {{input.customerEmail}}\nReported priority: {{input.priority}}',
             temperature: '0.2',
             maxTokens: '300',
           },
@@ -106,7 +106,7 @@ export function createSampleWorkflow(): Workflow {
       },
     ],
     edges: [
-      { id: generateId(), source: triggerId, target: llmId, sourceHandle: 'bottom', targetHandle: 'top' },
+      { id: generateId(), source: inputId, target: llmId, sourceHandle: 'bottom', targetHandle: 'top' },
       { id: generateId(), source: llmId, target: transformId, sourceHandle: 'bottom', targetHandle: 'top' },
       { id: generateId(), source: transformId, target: conditionId, sourceHandle: 'bottom', targetHandle: 'top' },
       { id: generateId(), source: conditionId, target: httpId, sourceHandle: 'bottom', targetHandle: 'top' },

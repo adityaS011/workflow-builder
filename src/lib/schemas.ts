@@ -1,17 +1,29 @@
 import { z } from 'zod'
 
-export const NodeTypeSchema = z.enum(['trigger', 'llm', 'transform', 'condition', 'http', 'output'])
+export const NodeTypeSchema = z.enum(['input', 'llm', 'transform', 'condition', 'http', 'output'])
+const PersistedNodeTypeSchema = z.enum(['input', 'trigger', 'llm', 'transform', 'condition', 'http', 'output'])
 
 export const WorkflowNodeSchema = z.object({
   id: z.string().min(1),
-  type: NodeTypeSchema,
+  type: PersistedNodeTypeSchema,
   position: z.object({ x: z.number(), y: z.number() }),
   data: z.object({
     label: z.string().min(1),
     description: z.string().optional(),
     config: z.record(z.string(), z.unknown()).optional(),
   }),
-})
+}).transform((node) => (
+  node.type === 'trigger'
+    ? {
+        ...node,
+        type: 'input' as const,
+        data: {
+          ...node.data,
+          label: node.data.label === 'Trigger' ? 'Input' : node.data.label.replace(/trigger/i, 'input'),
+        },
+      }
+    : node
+))
 
 export const WorkflowEdgeSchema = z.object({
   id: z.string().min(1),
@@ -45,11 +57,10 @@ export const PersistedStateSchema = z.object({
 })
 
 // Per-node-type config schemas (used by RHF resolver)
-export const TriggerConfigSchema = z.object({
-  triggerType: z.enum(['webhook', 'schedule', 'event']).or(z.literal('')),
-  eventName: z.string(),
-  schedule: z.string(),
-  description: z.string(),
+export const InputConfigSchema = z.object({
+  fields: z.string(),
+  defaultValues: z.string(),
+  instructions: z.string(),
 })
 
 export const LlmConfigSchema = z.object({
@@ -91,7 +102,7 @@ export const OutputConfigSchema = z.object({
 })
 
 export const NODE_SCHEMAS = {
-  trigger: TriggerConfigSchema,
+  input: InputConfigSchema,
   llm: LlmConfigSchema,
   transform: TransformConfigSchema,
   condition: ConditionConfigSchema,

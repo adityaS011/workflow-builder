@@ -145,7 +145,6 @@ export const useWorkflowStore = create<WorkflowStore>()(
           if (!currentWorkflow) return { valid: false, errors: ['No workflow loaded'] }
           const errors: string[] = []
           if (currentWorkflow.nodes.length === 0) errors.push('Workflow has no nodes')
-          if (!currentWorkflow.nodes.some((n) => n.type === 'trigger')) errors.push('Needs at least one Trigger node')
           if (currentWorkflow.nodes.length > 0 && !currentWorkflow.nodes.some((n) => n.type === 'output')) errors.push('Needs at least one Output node')
           const connectedIds = new Set(currentWorkflow.edges.flatMap((e) => [e.source, e.target]))
           const orphans = currentWorkflow.nodes.filter((n) => currentWorkflow.nodes.length > 1 && !connectedIds.has(n.id))
@@ -164,7 +163,11 @@ export const useWorkflowStore = create<WorkflowStore>()(
             console.warn('[workflow-store] Corrupted localStorage, resetting.', parsed.error.issues)
             return current
           }
-          return { ...current, ...parsed.data }
+          return {
+            ...current,
+            workflows: parsed.data.workflows as Workflow[],
+            filters: parsed.data.filters,
+          }
         },
       }
     )

@@ -1,4 +1,4 @@
-import { Webhook, Brain, Shuffle, GitBranch, Globe, Send, type LucideIcon } from 'lucide-react'
+import { Keyboard, Brain, Shuffle, GitBranch, Globe, Send, type LucideIcon } from 'lucide-react'
 
 export interface NodeMeta {
   Icon: LucideIcon
@@ -11,9 +11,9 @@ export interface NodeMeta {
 }
 
 const META_MAP: Record<string, NodeMeta> = {
-  trigger: {
-    Icon: Webhook,
-    label: 'Trigger',
+  input: {
+    Icon: Keyboard,
+    label: 'Input',
     color: 'text-emerald-400',
     border: 'border-emerald-500/30',
     bg: 'bg-emerald-500/5',

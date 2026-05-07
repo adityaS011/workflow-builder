@@ -1,17 +1,25 @@
 import { NodeFieldDef } from '@/types/workflow'
 
 const FIELDS_MAP: Record<string, NodeFieldDef[]> = {
-  trigger: [
+  input: [
     {
-      key: 'triggerType',
-      label: 'Trigger Type',
-      type: 'select',
-      options: ['webhook', 'schedule', 'event'],
-      placeholder: 'Select trigger type',
+      key: 'fields',
+      label: 'Runtime Fields',
+      type: 'textarea',
+      placeholder: 'customerMessage: Customer Message | textarea | required\npriority: Priority | text',
     },
-    { key: 'eventName', label: 'Event / Path', type: 'text', placeholder: 'e.g. /webhook or user.signup' },
-    { key: 'schedule', label: 'Cron Schedule', type: 'text', placeholder: '*/5 * * * *' },
-    { key: 'description', label: 'Description', type: 'textarea', placeholder: 'What starts this pipeline?' },
+    {
+      key: 'defaultValues',
+      label: 'Test Defaults (JSON)',
+      type: 'textarea',
+      placeholder: '{"customerMessage": "I need a refund", "priority": "high"}',
+    },
+    {
+      key: 'instructions',
+      label: 'Run Instructions',
+      type: 'textarea',
+      placeholder: 'What should the runner enter here?',
+    },
   ],
   llm: [
     {

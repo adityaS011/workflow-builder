@@ -1,19 +1,22 @@
 'use client'
 
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { WorkflowSidebar } from './workflow-sidebar'
 import { WorkflowCanvas } from './workflow-canvas'
 import { WorkflowHeader } from './workflow-header'
 import { NodePropertiesPanel } from './node-properties-panel'
+import { RunInputDialog } from './run-input-dialog'
 import { useWorkflowStore } from '@/store/workflow-store'
 import { useRunWorkflow } from '@/hooks/use-run-workflow'
+import { parseInputFields } from '@/lib/input-fields'
 import type { Node, Edge } from '@xyflow/react'
 
 export function WorkflowEditor() {
   const { currentWorkflow } = useWorkflowStore()
   const { run, stop } = useRunWorkflow()
+  const [showRunInput, setShowRunInput] = useState(false)
 
   // Stable ref so WorkflowCanvas can expose its addNode handler upward
   const addNodeRef = useRef<(type: string, label: string) => void>(() => {})
@@ -49,6 +52,23 @@ export function WorkflowEditor() {
     URL.revokeObjectURL(url)
   }
 
+  const inputNode = currentWorkflow?.nodes.find((node) => node.type === 'input') ?? null
+  const runtimeFields = useMemo(() => parseInputFields(inputNode?.data.config?.fields), [inputNode])
+
+  const handleRunRequest = () => {
+    if (inputNode && runtimeFields.length > 0) {
+      setShowRunInput(true)
+      return
+    }
+
+    void run()
+  }
+
+  const handleRunWithInput = (values: Record<string, string>) => {
+    setShowRunInput(false)
+    void run(values)
+  }
+
   if (!currentWorkflow) {
     return (
       <div className="flex items-center justify-center h-screen bg-background">
@@ -69,7 +89,7 @@ export function WorkflowEditor() {
       <div className="flex flex-1 flex-col min-w-0">
         <WorkflowHeader
           workflow={currentWorkflow}
-          onRun={run}
+          onRun={handleRunRequest}
           onStop={stop}
           onExport={handleExport}
         />
@@ -82,6 +102,15 @@ export function WorkflowEditor() {
       </div>
 
       <NodePropertiesPanel />
+
+      {showRunInput && inputNode && (
+        <RunInputDialog
+          inputNode={inputNode}
+          fields={runtimeFields}
+          onCancel={() => setShowRunInput(false)}
+          onRun={handleRunWithInput}
+        />
+      )}
     </div>
   )
 }

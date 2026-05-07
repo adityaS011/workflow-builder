@@ -1,4 +1,4 @@
-export type NodeType = 'trigger' | 'llm' | 'transform' | 'condition' | 'http' | 'output'
+export type NodeType = 'input' | 'llm' | 'transform' | 'condition' | 'http' | 'output'
 
 export interface WorkflowNode {
   id: string
@@ -44,6 +44,14 @@ export interface WorkflowTemplate {
   category: string
   nodes: Omit<WorkflowNode, 'id' | 'position'>[]
   thumbnail?: string
+}
+
+export interface RuntimeInputField {
+  key: string
+  label: string
+  type: 'text' | 'textarea' | 'number'
+  required: boolean
+  placeholder?: string
 }
 
 export interface NodeTemplate {

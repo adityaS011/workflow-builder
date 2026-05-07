@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type DragEvent } from 'react'
 import { Search, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { NODE_TEMPLATES, SIDEBAR_CATEGORIES, type SidebarNodeTemplate } from './node-templates'
@@ -9,10 +9,20 @@ interface WorkflowSidebarProps {
   onAddNode: (type: string, label: string) => void
 }
 
+function startNodeDrag(event: DragEvent<HTMLElement>, template: SidebarNodeTemplate) {
+  event.dataTransfer.setData('application/reactflow', JSON.stringify({ type: template.type, label: template.name }))
+  event.dataTransfer.effectAllowed = 'move'
+}
+
 function NodeCard({ template, onAdd }: { template: SidebarNodeTemplate; onAdd: () => void }) {
   const Icon = template.Icon
   return (
-    <button onClick={onAdd} className="w-full text-left p-3 rounded-lg border border-border bg-secondary/30 hover:bg-secondary hover:border-border/80 transition-all group">
+    <button
+      onClick={onAdd}
+      draggable
+      onDragStart={(event) => startNodeDrag(event, template)}
+      className="w-full cursor-grab text-left p-3 rounded-lg border border-border bg-secondary/30 hover:bg-secondary hover:border-border/80 active:cursor-grabbing transition-all group"
+    >
       <div className="flex items-center gap-2 mb-1">
         <div className={`w-6 h-6 rounded-md border flex items-center justify-center flex-shrink-0 ${template.accent} ${template.color}`}>
           <Icon className="h-3.5 w-3.5" />
@@ -70,7 +80,7 @@ export function WorkflowSidebar({ onAddNode }: WorkflowSidebarProps) {
           </div>
 
           <div className="px-3 py-2.5 border-t border-border bg-secondary/20">
-            <p className="text-xs text-muted-foreground">Click a node to add it to the canvas</p>
+            <p className="text-xs text-muted-foreground">Click or drag a node onto the canvas</p>
           </div>
         </>
       )}
@@ -80,7 +90,14 @@ export function WorkflowSidebar({ onAddNode }: WorkflowSidebarProps) {
           {NODE_TEMPLATES.map((t) => {
             const Icon = t.Icon
             return (
-              <button key={t.type} onClick={() => onAddNode(t.type, t.name)} title={t.name} className={`w-7 h-7 rounded-md border flex items-center justify-center ${t.accent} ${t.color} hover:scale-110 transition-transform`}>
+              <button
+                key={t.type}
+                onClick={() => onAddNode(t.type, t.name)}
+                draggable
+                onDragStart={(event) => startNodeDrag(event, t)}
+                title={t.name}
+                className={`w-7 h-7 cursor-grab rounded-md border flex items-center justify-center ${t.accent} ${t.color} hover:scale-110 active:cursor-grabbing transition-transform`}
+              >
                 <Icon className="h-3.5 w-3.5" />
               </button>
             )

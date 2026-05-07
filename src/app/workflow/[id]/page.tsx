@@ -11,9 +11,7 @@ export default function WorkflowPage() {
 
   useEffect(() => {
     const workflow = workflows.find(w => w.id === params.id)
-    if (workflow) {
-      setCurrentWorkflow(workflow)
-    }
+    setCurrentWorkflow(workflow ?? null)
   }, [params.id, workflows, setCurrentWorkflow])
 
   return <WorkflowEditor />

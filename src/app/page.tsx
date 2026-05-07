@@ -18,7 +18,7 @@ type StatusTab = typeof STATUS_TABS[number]
 
 export default function WorkflowList() {
   const router = useRouter()
-  const { workflows, addWorkflow, deleteWorkflow, duplicateWorkflow, filters, setFilters, getFilteredWorkflows } = useWorkflowStore()
+  const { workflows, addWorkflow, deleteWorkflow, duplicateWorkflow, setCurrentWorkflow, filters, setFilters, getFilteredWorkflows } = useWorkflowStore()
   const [searchTerm, setSearchTerm] = useState(filters.search)
   const [activeTab, setActiveTab] = useState<StatusTab>('all')
 
@@ -47,6 +47,7 @@ export default function WorkflowList() {
       status: 'draft',
     }
     addWorkflow(workflow)
+    setCurrentWorkflow(workflow)
     toast.success('Workflow created')
     router.push(`/workflow/${workflow.id}`)
   }
@@ -54,6 +55,7 @@ export default function WorkflowList() {
   const handleLoadSample = () => {
     const sample = createSampleWorkflow()
     addWorkflow(sample)
+    setCurrentWorkflow(sample)
     toast.success('Sample loaded', { description: 'AI Support Ticket Triage' })
     router.push(`/workflow/${sample.id}`)
   }

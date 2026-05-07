@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { WorkflowSidebar } from './workflow-sidebar'
@@ -20,6 +20,22 @@ export function WorkflowEditor() {
   const registerAddNode = (fn: (type: string, label: string) => void) => {
     addNodeRef.current = fn
   }
+
+  const initialNodes: Node[] = useMemo(() => currentWorkflow?.nodes.map((n) => ({
+    id: n.id,
+    type: 'custom',
+    position: n.position,
+    data: n.data,
+  })) ?? [], [currentWorkflow?.nodes])
+
+  const initialEdges: Edge[] = useMemo(() => currentWorkflow?.edges.map((e) => ({
+    id: e.id,
+    source: e.source,
+    target: e.target,
+    sourceHandle: e.sourceHandle,
+    targetHandle: e.targetHandle,
+    animated: true,
+  })) ?? [], [currentWorkflow?.edges])
 
   const handleExport = () => {
     if (!currentWorkflow) return
@@ -46,22 +62,6 @@ export function WorkflowEditor() {
     )
   }
 
-  const initialNodes: Node[] = currentWorkflow.nodes.map((n) => ({
-    id: n.id,
-    type: 'custom',
-    position: n.position,
-    data: n.data,
-  }))
-
-  const initialEdges: Edge[] = currentWorkflow.edges.map((e) => ({
-    id: e.id,
-    source: e.source,
-    target: e.target,
-    sourceHandle: e.sourceHandle,
-    targetHandle: e.targetHandle,
-    animated: true,
-  }))
-
   return (
     <div className="flex h-screen bg-background overflow-hidden">
       <WorkflowSidebar onAddNode={(type, label) => addNodeRef.current(type, label)} />
@@ -74,6 +74,7 @@ export function WorkflowEditor() {
           onExport={handleExport}
         />
         <WorkflowCanvas
+          workflowId={currentWorkflow.id}
           initialNodes={initialNodes}
           initialEdges={initialEdges}
           onAddNodeRef={registerAddNode}

@@ -2,13 +2,13 @@
 
 A visual, no-code pipeline builder for composing AI-powered automations. Drag nodes onto a canvas, configure them, connect them, and watch your workflow execute step-by-step with live visual feedback.
 
-> Think Zapier + Make.com, but AI-native.
+>Upcoming vision:  Think Zapier + Make.com, but AI-native.
 
 ---
 
 ## Screenshots
 
-<img width="500" height="400" alt="image" src="https://github.com/user-attachments/assets/164692cc-62e6-4f85-9c6f-49d808153413" />
+<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/164692cc-62e6-4f85-9c6f-49d808153413" />
 
 ---
 

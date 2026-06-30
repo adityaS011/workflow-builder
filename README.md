@@ -8,9 +8,7 @@ A visual, no-code pipeline builder for composing AI-powered automations. Drag no
 
 ## Screenshots
 
-- **Home** — dashboard of workflows with stats, search, and status tabs
-- **Editor** — three-pane canvas (node library · DAG canvas · properties panel)
-- **Run** — animated per-node execution with success/error toasts
+<img width="500" height="400" alt="image" src="https://github.com/user-attachments/assets/164692cc-62e6-4f85-9c6f-49d808153413" />
 
 ---
 

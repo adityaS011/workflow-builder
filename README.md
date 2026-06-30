@@ -8,7 +8,7 @@ A visual, no-code pipeline builder for composing AI-powered automations. Drag no
 
 ## Screenshots
 
-<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/164692cc-62e6-4f85-9c6f-49d808153413" />
+<img width="1200" height="600" alt="image" src="https://github.com/user-attachments/assets/164692cc-62e6-4f85-9c6f-49d808153413" />
 
 ---
 
